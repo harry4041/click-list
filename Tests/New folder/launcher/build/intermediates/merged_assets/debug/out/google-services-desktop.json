@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "509593076050",
+    "firebase_url": "https://click-list-b119f-default-rtdb.firebaseio.com",
+    "project_id": "click-list-b119f",
+    "storage_bucket": "click-list-b119f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:509593076050:android:009ce42b5b184689cdba8b",
+        "android_client_info": {
+          "package_name": "com.DefaultCompany.com.unity.template.mobile2D"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "509593076050-s31st1bmptqhvka4vugki60r1injdgji.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJMxBtlWKL8HNXQ9ARHM--zdVH2kHfo4c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "509593076050-s31st1bmptqhvka4vugki60r1injdgji.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

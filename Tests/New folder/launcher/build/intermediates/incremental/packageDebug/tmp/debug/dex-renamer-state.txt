@@ -1,0 +1,4 @@
+#Sun Apr 17 12:46:48 BST 2022
+base.0=C\:\\Users\\Hrjco\\Unity\\ClickList\\Tests\\New folder\\launcher\\build\\intermediates\\dex\\debug\\mergeDexDebug\\classes.dex
+renamed.0=classes.dex
+path.0=classes.dex

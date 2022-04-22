@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/New_folder.iml" filepath="$PROJECT_DIR$/.idea/modules/New_folder.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/launcher/New_folder.launcher.iml" filepath="$PROJECT_DIR$/.idea/modules/launcher/New_folder.launcher.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/unityLibrary/New_folder.unityLibrary.iml" filepath="$PROJECT_DIR$/.idea/modules/unityLibrary/New_folder.unityLibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/unityLibrary/FirebaseApp.androidlib/New_folder.unityLibrary.FirebaseApp.androidlib.iml" filepath="$PROJECT_DIR$/.idea/modules/unityLibrary/FirebaseApp.androidlib/New_folder.unityLibrary.FirebaseApp.androidlib.iml" />
+    </modules>
+  </component>
+</project>
