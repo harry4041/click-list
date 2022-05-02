@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class Touches : MonoBehaviour
 {
     public GameObject MGPanel;
@@ -21,7 +22,7 @@ public class Touches : MonoBehaviour
                 if (touch.phase == TouchPhase.Ended)
                 {
                     touches += 1;
-                    FB.clicksToPush += 1;
+                    FB.ClickButton(1);
                     FB.UpdateClickLocally(touches);
                 }
 

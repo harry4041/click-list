@@ -6,6 +6,10 @@ using Firebase.Database;
 using TMPro;
 using System.Linq;
 
+//click
+//clickWeekly
+//clickMonthly
+//clickAlltime
 public class FirebaseManager : MonoBehaviour
 {
     //Firebase variables
@@ -39,12 +43,16 @@ public class FirebaseManager : MonoBehaviour
 
     public GameObject loginPanel;
     public GameObject mainGamePanel;
+    
     public int FBClicks;
     public int testClick;
     public int clicksToPush;
-
+    
+    public Coroutine lb;
+    public Coroutine lbUpdate;
     public Coroutine leaderboardCoroutine;
 
+    public GameManager GM;
 
     void Awake()
     {
@@ -56,7 +64,7 @@ public class FirebaseManager : MonoBehaviour
             {
                 //If they are avalible Initialize Firebase
                 InitializeFirebase();
-                InvokeRepeating(nameof(IncreaseClicks), 5.0f, 5.0f);
+                //InvokeRepeating(nameof(IncreaseClicks), 5.0f, 5.0f);
             }
             else
             {
@@ -82,7 +90,7 @@ public class FirebaseManager : MonoBehaviour
         StartCoroutine(Login(emailLoginField.text, passwordLoginField.text));
         
         //Start the leaderboard updating
-        StartCoroutine(KeepScoreboardUpdating("click", scoreboardContent));
+        lb = StartCoroutine(KeepScoreboardUpdating("click", scoreboardContent));
 
     }
     //Function for the register button
@@ -102,14 +110,22 @@ public class FirebaseManager : MonoBehaviour
 
     public void ScoreboardButton(string clickType)
     {
-        //StopCoroutine(leaderboardCoroutine);
-        leaderboardCoroutine = StartCoroutine(LoadScoreboardData(clickType, scoreboardContent));
+        if(lb != null)
+        {
+            StopCoroutine(lb);
+            StopCoroutine(lbUpdate);
+        }
+        lb = StartCoroutine(KeepScoreboardUpdating(clickType, scoreboardContent));
+
 
     }
     
     public void ClickButton(int clicksToAdd)
     {
         StartCoroutine(IncreaseClicks(clicksToAdd, "click"));
+        StartCoroutine(IncreaseClicks(clicksToAdd, "clickWeekly"));
+        StartCoroutine(IncreaseClicks(clicksToAdd, "clickMonthly"));
+        StartCoroutine(IncreaseClicks(clicksToAdd, "clickAlltime"));
     }
 
 
@@ -218,9 +234,9 @@ public class FirebaseManager : MonoBehaviour
                 //Now get the result
                 User = RegisterTask.Result;
                 var DBTask = DBreference.Child("users").Child(User.UserId).Child("click").SetValueAsync(0);
-                var DBTask1 = DBreference.Child("users").Child(User.UserId).Child("weeklyClick").SetValueAsync(0);
-                var DBTask2 = DBreference.Child("users").Child(User.UserId).Child("monthlyClick").SetValueAsync(0);
-                var DBTask3 = DBreference.Child("users").Child(User.UserId).Child("allTimeClick").SetValueAsync(0);
+                var DBTask1 = DBreference.Child("users").Child(User.UserId).Child("clickWeekly").SetValueAsync(0);
+                var DBTask2 = DBreference.Child("users").Child(User.UserId).Child("clickMonthly").SetValueAsync(0);
+                var DBTask3 = DBreference.Child("users").Child(User.UserId).Child("clickAlltime").SetValueAsync(0);
 
                 if (User != null)
                 {
@@ -289,6 +305,44 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
+    public IEnumerator SetFBValue(string child, int value)
+    {
+        //Set the currently logged in user username in the database
+        var DBTask = DBreference.Child("users").Child(User.UserId).Child(child).SetValueAsync(value);
+
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else
+        {
+            //Database username is now updated
+        }
+    }
+
+    public IEnumerable GetFBValue(string child)
+    {
+        //Get the currently logged in user data
+        var DBTask = DBreference.Child("users").Child(User.UserId).Child(child).GetValueAsync();
+
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else
+        {
+            //Data has been retrieved
+            DataSnapshot snapshot = DBTask.Result;
+
+            yield return snapshot.Child(child).Value;
+        }
+
+    }
+
 
     //TODO: Find a way of doing this not on every click
     private IEnumerator IncreaseClicks(int clicksToAdd, string timeClick)
@@ -323,7 +377,7 @@ public class FirebaseManager : MonoBehaviour
                 click += clicksToAdd;
                 StartCoroutine(UpdateClick(click, timeClick));
                 lifetimeClicks.text = click.ToString();
-                FBClicks = int.Parse(snapshot.Child(timeClick).Value.ToString());
+                FBClicks = int.Parse(snapshot.Child("click").Value.ToString());
                 Debug.Log("FB " + click);
             }
 
@@ -338,6 +392,7 @@ public class FirebaseManager : MonoBehaviour
         
     }
 
+    //Push clicks to FB
     private IEnumerator UpdateClick(int _click, string child)
     {
         //Set the currently logged in user clicks
@@ -358,16 +413,17 @@ public class FirebaseManager : MonoBehaviour
     //Update clicks locally so user personal numbers update on every click (even though its not being pushed to FB)
     public void UpdateClickLocally(int clicksToAdd)
     {
-        testClick = clicksToAdd + FBClicks;
+        /*testClick = clicksToAdd + FBClicks;
         if (testClick > FBClicks)
         {
             testClick = FBClicks;
         }
         //It's easier to just add 1 here rather than messing around with FB stuff
-        lifetimeClicks.text = (testClick + 1).ToString();
-        
-        
-        
+        lifetimeClicks.text = (testClick + 1).ToString();*/
+        lifetimeClicks.text = FBClicks.ToString();
+
+
+
         Debug.Log("Local " + testClick);
 
     }
@@ -430,6 +486,8 @@ public class FirebaseManager : MonoBehaviour
                 GameObject scoreboardElement = Instantiate(scoreElement, scoreCont);
                 scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(username, click);
             }
+
+            
         }
         
     }
@@ -439,6 +497,6 @@ public class FirebaseManager : MonoBehaviour
     {
         StartCoroutine(LoadScoreboardData(clickType, scoreboardCont));
         yield return new WaitForSeconds(1.5f);
-        StartCoroutine(KeepScoreboardUpdating(clickType, scoreboardCont));
+        lbUpdate = StartCoroutine(KeepScoreboardUpdating(clickType, scoreboardCont));
     }
 }
