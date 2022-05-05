@@ -14,8 +14,9 @@ using System.Net.Sockets;
 
 public class ClickResets : MonoBehaviour
 {
+	///THIS WHOLE THING NEEDS TO BE HANDLED BY A CLOUD FUNCTION
 
-	int dayOfWeekInt;
+	/*int dayOfWeekInt;
 
 	int lastDayLogged;
 	int lastMonthLogged;
@@ -131,5 +132,5 @@ public class ClickResets : MonoBehaviour
 		}
 
 
-	}
+	}*/
 }
