@@ -349,7 +349,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &77268532
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1714,9 +1714,17 @@ MonoBehaviour:
   warningRegisterText: {fileID: 1307612341}
   usernameField: {fileID: 455119283}
   clickField: {fileID: 2063763096}
-  lifetimeClicks: {fileID: 2057445499}
   scoreElement: {fileID: 1472164434015034400, guid: fe7c7110b983a4a428b995024f32fe08, type: 3}
   scoreboardContent: {fileID: 3996894860140039351}
+  lifetimeClicks: {fileID: 2057445499}
+  dailyClicks: {fileID: 1696545179}
+  weeklyClicks: {fileID: 1469761195}
+  monthlyClicks: {fileID: 603877252}
+  lifetimeInt: 0
+  dailyInt: 0
+  weeklyInt: 0
+  monthlyInt: 0
+  canUpdateClicks: 0
   loginPanel: {fileID: 701138877}
   mainGamePanel: {fileID: 870861817}
   FBClicks: 0
@@ -8526,7 +8534,7 @@ GameObject:
   - component: {fileID: 1696545180}
   - component: {fileID: 1696545179}
   m_Layer: 5
-  m_Name: DailyText(TMP) (1)
+  m_Name: DailyNum(TMP) (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

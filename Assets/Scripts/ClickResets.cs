@@ -15,8 +15,9 @@ using System.Net.Sockets;
 public class ClickResets : MonoBehaviour
 {
 	///THIS WHOLE THING NEEDS TO BE HANDLED BY A CLOUD FUNCTION
-
-	/*int dayOfWeekInt;
+	///THIS WHOLE THING IS NOW HANDLED BY A CLOUD FUNCTION AND WILL NOT RUN
+	
+	int dayOfWeekInt;
 
 	int lastDayLogged;
 	int lastMonthLogged;
@@ -29,9 +30,9 @@ public class ClickResets : MonoBehaviour
 	{
 
 		//Last times logged in
-		int lastDayLogged;  //GET FROM FB - if no value, then set value. Also dont login until got
-		int lastMonthLogged;  //GET FROM FB - if no value, then set value. Also dont login until got
-		int lastWeekDayLogged;  //GET FROM FB - if no value, then set value. Also dont login until got
+		lastDayLogged = 1;  //GET FROM FB - if no value, then set value. Also dont login until got
+		lastMonthLogged = 1;  //GET FROM FB - if no value, then set value. Also dont login until got
+		lastWeekDayLogged = 1;  //GET FROM FB - if no value, then set value. Also dont login until got
 		dayOfWeekInt = (int)GM.currentTime.DayOfWeek;
 	}
 
@@ -54,17 +55,17 @@ public class ClickResets : MonoBehaviour
 		if (lastDayLogged != GM.currentTime.Day)
 		{
 			//FB reset Daily clicks
-			StartCoroutine(FB.SetFBValue("click", 0));
+			FB.dailyClicks.text = 0.ToString();
 		}
 		if (lastWeekDayLogged > dayOfWeekInt) //If the day of the week is less than the day they were last on, it must be a new week...right?
 		{
 			//FB reset Weekly clicks
-			StartCoroutine(FB.SetFBValue("clickWeekly", 0));
+			FB.weeklyClicks.text = 0.ToString();
 		}
 		if (lastMonthLogged != GM.currentTime.Month)
 		{
 			//FB reset Monthly clicks
-			StartCoroutine(FB.SetFBValue("clickMonthly", 0));
+			FB.monthlyClicks.text = 0.ToString();
 		}
 
 
@@ -76,11 +77,7 @@ public class ClickResets : MonoBehaviour
 		Invoke("thisFunc", SecondsLeftOfDay());
 		Invoke("thisFunc", SecondsLeftOfWeek());
 		Invoke("thisFunc", SecondsLeftOfMonth());
-		Debug.Log("########");
-		Debug.Log(SecondsLeftOfDay());
-		Debug.Log(SecondsLeftOfWeek());
-		Debug.Log(SecondsLeftOfMonth());
-		Debug.Log("########");
+		
 
 	}
 
@@ -132,5 +129,5 @@ public class ClickResets : MonoBehaviour
 		}
 
 
-	}*/
+	}
 }
