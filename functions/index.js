@@ -19,6 +19,7 @@ exports.dailyReset = functions.pubsub.schedule("01 0 * * 1")
           child.ref.update({
             lastDaily: oldClickValue,
             click: 0,
+            dailyMidnight: "dailyMidnight",
           });
         });
       });
@@ -35,6 +36,7 @@ exports.weeklyReset = functions.pubsub.schedule("01 0 * * 1")
           child.ref.update({
             lastWeekly: oldClickValue,
             clickWeekly: 0,
+            weeklyMidnight: "weeklyMidnight",
           });
         });
       });
@@ -51,6 +53,7 @@ exports.monthlyReset = functions.pubsub.schedule("01 0 1 * *")
           child.ref.update({
             lastMonthly: oldClickValue,
             clickMonthly: 0,
+            monthlyMidnight: "monthlyMidnight",
           });
         });
       });

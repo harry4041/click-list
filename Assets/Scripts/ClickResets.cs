@@ -16,7 +16,7 @@ public class ClickResets : MonoBehaviour
 {
 	///THIS WHOLE THING NEEDS TO BE HANDLED BY A CLOUD FUNCTION
 	///THIS WHOLE THING IS NOW HANDLED BY A CLOUD FUNCTION AND WILL NOT RUN
-	
+	/*
 	int dayOfWeekInt;
 
 	int lastDayLogged;
@@ -129,5 +129,5 @@ public class ClickResets : MonoBehaviour
 		}
 
 
-	}
+	}*/
 }

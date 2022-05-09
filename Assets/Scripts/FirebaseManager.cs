@@ -50,6 +50,10 @@ public class FirebaseManager : MonoBehaviour
     public int monthlyInt;
     public bool canUpdateClicks = false;
 
+    public bool midnight = false;
+    public bool midnightWeekly = false;
+    public bool midnightMonthly = false;
+
     [Header("Everything else")]
     public GameObject loginPanel;
     public GameObject mainGamePanel;
@@ -85,7 +89,6 @@ public class FirebaseManager : MonoBehaviour
 
 
     }
-
     private void InitializeFirebase()
     {
         Debug.Log("Setting up Firebase Auth");
@@ -133,9 +136,9 @@ public class FirebaseManager : MonoBehaviour
 
     public void ClickButton(int clicksToAdd)
     {
-        StartCoroutine(IncreaseClicks("click", clicksToAdd));
-        StartCoroutine(IncreaseClicks("clickWeekly", clicksToAdd));
-        StartCoroutine(IncreaseClicks("clickMonthly", clicksToAdd));
+        StartCoroutine(IncreaseClicks("click", clicksToAdd, dailyClicks));
+        StartCoroutine(IncreaseClicks("clickWeekly", clicksToAdd, weeklyClicks));
+        StartCoroutine(IncreaseClicks("clickMonthly", clicksToAdd, monthlyClicks));
         StartCoroutine(IncreaseClicks("clickAlltime", clicksToAdd));
     }
 
@@ -187,12 +190,16 @@ public class FirebaseManager : MonoBehaviour
 
 
             usernameField.text = User.DisplayName;
+
             //Hide the login panel and open the game panel
             mainGamePanel.SetActive(!mainGamePanel.activeInHierarchy);
             yield return new WaitForSeconds(1.5f);
             loginPanel.SetActive(!loginPanel.activeInHierarchy);
+
             //UIManager.instance.UserDataScreen(); // Change to user data UI
             warningRegisterText.text = "";
+
+            InvokeRepeating(nameof(GetTimeFunc), 2, 2);
         }
     }
 
@@ -314,36 +321,44 @@ public class FirebaseManager : MonoBehaviour
 
 
     //TODO: Find a way of doing this not on every click to make it cheaper
-    private IEnumerator IncreaseClicks(string timeClick, int clicksToAdd)
+    private IEnumerator IncreaseClicks(string timeClick, int clicksToAdd, TMP_Text localComparision = null)
     {
-            //Get the currently logged in user data
-            var DBTask = DBreference.Child("users").Child(User.UserId).GetValueAsync();
+        //Get the currently logged in user data
+        var DBTask = DBreference.Child("users").Child(User.UserId).GetValueAsync();
 
-            yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
 
-            if (DBTask.Exception != null)
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else if (DBTask.Result.Value == null)
+        {
+            //No data exists yet
+            clickField.text = "0";
+        }
+        else
+        {
+            //Data has been retrieved
+            DataSnapshot snapshot = DBTask.Result;
+
+            //Set 'click' to FB variable of user click
+            int click = int.Parse(snapshot.Child(timeClick).Value.ToString());
+
+            //Add clicks and add to FB
+            click += clicksToAdd;
+
+            StartCoroutine(UpdateClick(click, timeClick));
+
+            if (localComparision != null)
             {
-                Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+                localComparision.text = click.ToString();
             }
-            else if (DBTask.Result.Value == null)
-            {
-                //No data exists yet
-                clickField.text = "0";
-            }
-            else
-            {
-                //Data has been retrieved
-                DataSnapshot snapshot = DBTask.Result;
 
-                //Set 'click' to FB variable of user click
-                int click = int.Parse(snapshot.Child(timeClick).Value.ToString());
 
-                //Add clicks and add to FB
-                click += clicksToAdd;
-
-                StartCoroutine(UpdateClick(click, timeClick));
-            }
+        }
     }
+
 
     //Push clicks to FB
     private IEnumerator UpdateClick(int _click, string child)
@@ -415,6 +430,11 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
+    public void ResetLocalClicks()
+    {
+
+    }
+
     public IEnumerator SetFBValue(string child, int value)
     {
         //Set the currently logged in user username in the database
@@ -428,7 +448,7 @@ public class FirebaseManager : MonoBehaviour
         }
         else
         {
-            
+
         }
     }
 
@@ -502,6 +522,65 @@ public class FirebaseManager : MonoBehaviour
         StartCoroutine(LoadScoreboardData(clickType, scoreboardCont));
         yield return new WaitForSeconds(1.5f);
         lbUpdate = StartCoroutine(KeepScoreboardUpdating(clickType, scoreboardCont));
+    }
+
+    public IEnumerator GetTime()
+    {
+        {
+            //Get the currently logged in user data
+            var DBTask = DBreference.Child("users").Child(User.UserId).GetValueAsync();
+            var DBTask2 = DBreference.Child("users").Child(User.UserId);
+
+            yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+            if (DBTask.Exception != null)
+            {
+                Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+            }
+            else if (DBTask.Result.Value == null)
+            {
+                //No data exists yet
+            }
+            else
+            {
+                //Data has been retrieved
+                DataSnapshot snapshot = DBTask.Result;
+
+                //Check to see if midnight
+                string daily = snapshot.Child("dailyMidnight").Value.ToString();
+                string weekly = snapshot.Child("weeklyMidnight").Value.ToString();
+                string monthly = snapshot.Child("monthlyMidnight").Value.ToString();
+
+                if (daily == "dailyMidnight")
+                {
+                    canUpdateClicks = false;
+                    StartCoroutine(UpdateLocalClicksOnStart());
+                    Debug.Log("Resetting daily");
+                    DBTask2.Child("dailyMidnight").SetValueAsync("isNot");
+                    canUpdateClicks = true;
+
+                }
+                if (weekly == "weeklyMidnight")
+                {
+                    canUpdateClicks = false;
+
+                    StartCoroutine(UpdateLocalClicksOnStart());
+                    DBTask2.Child("weeklyMidnight").SetValueAsync("isNot");
+                    Debug.Log("Resetting wkekly");
+                    canUpdateClicks = true;
+
+                }
+                if (monthly == "monthlyMidnight")
+                {
+                    DBTask2.Child("monthlyMidnight").SetValueAsync("isNot");
+                }
+            }
+        }
+    }
+
+    public void GetTimeFunc()
+    {
+        StartCoroutine(GetTime());
     }
 }
 

@@ -13,7 +13,7 @@ public class Touches : MonoBehaviour
     private void Start()
     {
         touches = 0;
-        InvokeRepeating(nameof(SendAndResetTouches), 0f, 5f);
+        InvokeRepeating(nameof(SendAndResetTouches), 0f, 3f);
     }
     // Update is called once per frame
     void Update()
@@ -39,7 +39,7 @@ public class Touches : MonoBehaviour
     {
             Debug.Log("Sending " + touches + " touches.");
             FB.ClickButton(touches);
-            touches = 0; 
+            touches = 0;   
     }
 }
 

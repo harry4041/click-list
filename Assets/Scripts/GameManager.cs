@@ -8,7 +8,7 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
-    public DateTime DTLoggedIn;
+    /*public DateTime DTLoggedIn;
     public string dateLoggedIn;
     public string timeLoggedIn;
 
@@ -17,6 +17,9 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI dt;
     public TextMeshProUGUI d;
     public TextMeshProUGUI t;
+
+    public FirebaseManager FB;
+
     private void Start()
     {
         //DTLoggedIn = GetNetworkTime();
@@ -25,16 +28,14 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        
-        if(DTLoggedIn != null)
+        if (DTLoggedIn != null)
         {
             if (Input.GetMouseButtonDown(0))
             {
                 UpdateTime();
-
+                Debug.Log(GetNetworkTime());
             }
         }
-
     }
 
     private void UpdateTime()
@@ -63,7 +64,7 @@ public class GameManager : MonoBehaviour
     public static DateTime GetNetworkTime()
     {
         //default Windows time server
-        const string ntpServer = "time.windows.com";
+        const string ntpServer = "ntp.my-inbox.co.uk";
 
         // NTP message size - 16 bytes of the digest (RFC 2030)
         var ntpData = new byte[48];
@@ -106,7 +107,7 @@ public class GameManager : MonoBehaviour
         var milliseconds = (intPart * 1000) + ((fractPart * 1000) / 0x100000000L);
 
         //**UTC** time
-        var networkDateTime = (new DateTime(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc)).AddMilliseconds((long)milliseconds);
+        var networkDateTime = (new DateTime(1900, 1, 1, 0, 0, 0, DateTimeKind.Local)).AddMilliseconds((long)milliseconds);
 
         return networkDateTime;
     }
@@ -118,6 +119,6 @@ public class GameManager : MonoBehaviour
                        ((x & 0x0000ff00) << 8) +
                        ((x & 0x00ff0000) >> 8) +
                        ((x & 0xff000000) >> 24));
-    }
+    }*/
 }
 

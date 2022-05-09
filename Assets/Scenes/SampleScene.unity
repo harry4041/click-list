@@ -6601,8 +6601,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2b63fad98814f524f862ce190f9c295d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FB: {fileID: 383119697}
-  GM: {fileID: 1209707891}
+  FB: {fileID: 0}
+  GM: {fileID: 0}
 --- !u!114 &1209707891
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6617,9 +6617,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dateLoggedIn: 
   timeLoggedIn: 
-  dt: {fileID: 1816076258}
-  d: {fileID: 1116282861}
-  t: {fileID: 1361656705}
+  dt: {fileID: 0}
+  d: {fileID: 0}
+  t: {fileID: 0}
 --- !u!1 &1232332995
 GameObject:
   m_ObjectHideFlags: 0
