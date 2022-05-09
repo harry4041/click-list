@@ -198,8 +198,6 @@ public class FirebaseManager : MonoBehaviour
 
             //UIManager.instance.UserDataScreen(); // Change to user data UI
             warningRegisterText.text = "";
-
-            InvokeRepeating(nameof(GetTimeFunc), 2, 2);
         }
     }
 
@@ -522,65 +520,6 @@ public class FirebaseManager : MonoBehaviour
         StartCoroutine(LoadScoreboardData(clickType, scoreboardCont));
         yield return new WaitForSeconds(1.5f);
         lbUpdate = StartCoroutine(KeepScoreboardUpdating(clickType, scoreboardCont));
-    }
-
-    public IEnumerator GetTime()
-    {
-        {
-            //Get the currently logged in user data
-            var DBTask = DBreference.Child("users").Child(User.UserId).GetValueAsync();
-            var DBTask2 = DBreference.Child("users").Child(User.UserId);
-
-            yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
-
-            if (DBTask.Exception != null)
-            {
-                Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
-            }
-            else if (DBTask.Result.Value == null)
-            {
-                //No data exists yet
-            }
-            else
-            {
-                //Data has been retrieved
-                DataSnapshot snapshot = DBTask.Result;
-
-                //Check to see if midnight
-                string daily = snapshot.Child("dailyMidnight").Value.ToString();
-                string weekly = snapshot.Child("weeklyMidnight").Value.ToString();
-                string monthly = snapshot.Child("monthlyMidnight").Value.ToString();
-
-                if (daily == "dailyMidnight")
-                {
-                    canUpdateClicks = false;
-                    StartCoroutine(UpdateLocalClicksOnStart());
-                    Debug.Log("Resetting daily");
-                    DBTask2.Child("dailyMidnight").SetValueAsync("isNot");
-                    canUpdateClicks = true;
-
-                }
-                if (weekly == "weeklyMidnight")
-                {
-                    canUpdateClicks = false;
-
-                    StartCoroutine(UpdateLocalClicksOnStart());
-                    DBTask2.Child("weeklyMidnight").SetValueAsync("isNot");
-                    Debug.Log("Resetting wkekly");
-                    canUpdateClicks = true;
-
-                }
-                if (monthly == "monthlyMidnight")
-                {
-                    DBTask2.Child("monthlyMidnight").SetValueAsync("isNot");
-                }
-            }
-        }
-    }
-
-    public void GetTimeFunc()
-    {
-        StartCoroutine(GetTime());
     }
 }
 
