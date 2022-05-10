@@ -15,9 +15,16 @@ exports.dailyReset = functions.pubsub.schedule("01 0 * * *")
       dbCon.once("value", function(snapshot) {
         snapshot.forEach(function(child) {
           const oldClickValue = child.val().click;
+          const oldPB = child.val().lastDaily;
+          let updatePB = null;
+          if (oldPB < oldClickValue) {
+            updatePB = oldClickValue;
+          } else {
+            updatePB = oldPB;
+          }
           console.log(oldClickValue);
           child.ref.update({
-            lastDaily: oldClickValue,
+            lastDaily: updatePB,
             click: 0,
             dailyMidnight: "dailyMidnight",
           });
@@ -32,9 +39,16 @@ exports.weeklyReset = functions.pubsub.schedule("01 0 * * 1")
       dbCon.once("value", function(snapshot) {
         snapshot.forEach(function(child) {
           const oldClickValue = child.val().clickWeekly;
+          const oldPB = child.val().lastWeekly;
+          let updatePB = null;
+          if (oldPB < oldClickValue) {
+            updatePB = oldClickValue;
+          } else {
+            updatePB = oldPB;
+          }
           console.log(oldClickValue);
           child.ref.update({
-            lastWeekly: oldClickValue,
+            lastWeekly: updatePB,
             clickWeekly: 0,
             weeklyMidnight: "weeklyMidnight",
           });
@@ -49,9 +63,16 @@ exports.monthlyReset = functions.pubsub.schedule("01 0 1 * *")
       dbCon.once("value", function(snapshot) {
         snapshot.forEach(function(child) {
           const oldClickValue = child.val().clickMonthly;
+          const oldPB = child.val().lastMonthly;
+          let updatePB = null;
+          if (oldPB < oldClickValue) {
+            updatePB = oldClickValue;
+          } else {
+            updatePB = oldPB;
+          }
           console.log(oldClickValue);
           child.ref.update({
-            lastMonthly: oldClickValue,
+            lastMonthly: updatePB,
             clickMonthly: 0,
             monthlyMidnight: "monthlyMidnight",
           });

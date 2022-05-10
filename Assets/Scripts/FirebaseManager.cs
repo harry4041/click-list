@@ -5,6 +5,7 @@ using Firebase.Auth;
 using Firebase.Database;
 using TMPro;
 using System.Linq;
+using System.Collections.Generic;
 
 //click
 //clickWeekly
@@ -38,6 +39,10 @@ public class FirebaseManager : MonoBehaviour
     public TMP_InputField clickField;
     public GameObject scoreElement;
     public Transform scoreboardContent;
+    public GameObject pbElement;
+    public Transform pbContent;
+
+
 
     [Header("LocalData")]
     public TMP_Text lifetimeClicks;
@@ -107,7 +112,7 @@ public class FirebaseManager : MonoBehaviour
         StartCoroutine(Login(emailLoginField.text, passwordLoginField.text));
 
         //Start the leaderboard updating
-        lb = StartCoroutine(KeepScoreboardUpdating("click", scoreboardContent));
+        lb = StartCoroutine(KeepScoreboardUpdating("click", "lastDaily", scoreboardContent, pbContent));
 
         //Update the user numbers then do it all locally
         StartCoroutine(UpdateLocalClicksOnStart());
@@ -129,12 +134,37 @@ public class FirebaseManager : MonoBehaviour
 
     public void ScoreboardButton(string clickType)
     {
+        string pbType;
         if (lb != null)
         {
             StopCoroutine(lb);
             StopCoroutine(lbUpdate);
         }
-        lb = StartCoroutine(KeepScoreboardUpdating(clickType, scoreboardContent));
+        
+        if(clickType == "click")
+        {
+            pbType = "lastDaily";
+            lb = StartCoroutine(KeepScoreboardUpdating(clickType, pbType, scoreboardContent, pbContent));
+        } 
+        else if(clickType == "clickWeekly")
+        {
+            pbType = "lastWeekly";
+            lb = StartCoroutine(KeepScoreboardUpdating(clickType, pbType, scoreboardContent, pbContent));
+
+        }
+        else if (clickType == "clickMonthly")
+        {
+            pbType = "lastMonthly";
+            lb = StartCoroutine(KeepScoreboardUpdating(clickType, pbType, scoreboardContent, pbContent));
+
+        }
+        else if (clickType == "clickAlltime")
+        {
+            pbType = "clickAlltime";
+            lb = StartCoroutine(KeepScoreboardUpdating(clickType, pbType, scoreboardContent, pbContent));
+
+        }
+        
     }
 
     public void ClickButton(int clicksToAdd)
@@ -252,6 +282,12 @@ public class FirebaseManager : MonoBehaviour
                 var DBTask1 = DBreference.Child("users").Child(User.UserId).Child("clickWeekly").SetValueAsync(0);
                 var DBTask2 = DBreference.Child("users").Child(User.UserId).Child("clickMonthly").SetValueAsync(0);
                 var DBTask3 = DBreference.Child("users").Child(User.UserId).Child("clickAlltime").SetValueAsync(0);
+                var DBTask4 = DBreference.Child("users").Child(User.UserId).Child("lastDaily").SetValueAsync(0);
+                var DBTask5 = DBreference.Child("users").Child(User.UserId).Child("lastMonthly").SetValueAsync(0);
+                var DBTask6 = DBreference.Child("users").Child(User.UserId).Child("lastWeekly").SetValueAsync(0);
+                var DBTask7 = DBreference.Child("users").Child(User.UserId).Child("dailyMidnight").SetValueAsync("dailyMidnight");
+                var DBTask8 = DBreference.Child("users").Child(User.UserId).Child("weeklyMidnight").SetValueAsync("weeklyMidnight");
+                var DBTask9 = DBreference.Child("users").Child(User.UserId).Child("monthlyMidnight").SetValueAsync("monthlyMidnight");
 
                 if (User != null)
                 {
@@ -503,10 +539,11 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    private IEnumerator LoadScoreboardData(string clickSpan, Transform scoreCont)
+    private IEnumerator LoadScoreboardData(string clickSpan, string pbSpan, Transform scoreCont, Transform pBcont)
     {
         //Get all the users data ordered by kills amount
         var DBTask = DBreference.Child("users").OrderByChild(clickSpan).GetValueAsync();
+        var DBTask2 = DBreference.Child("users").OrderByChild(pbSpan).GetValueAsync();
 
         yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
 
@@ -518,35 +555,50 @@ public class FirebaseManager : MonoBehaviour
         {
             //Data has been retrieved
             DataSnapshot snapshot = DBTask.Result;
+            DataSnapshot snapshot2 = DBTask2.Result;
 
             //Destroy any existing scoreboard elements
             foreach (Transform child in scoreCont.transform)
             {
                 Destroy(child.gameObject);
             }
-
-            //Loop through every users UID
-            foreach (DataSnapshot childSnapshot in snapshot.Children.Reverse<DataSnapshot>())
+            foreach (Transform child in pBcont.transform)
             {
-                string username = childSnapshot.Child("username").Value.ToString();
-                int click = int.Parse(childSnapshot.Child(clickSpan).Value.ToString());
+                Destroy(child.gameObject);
+            }
+
+            //Loop through every users UID and shows top 10
+            foreach (DataSnapshot childSnapshot in snapshot.Children.Reverse<DataSnapshot>().Take(10))
+            {
+                
+                    string username = childSnapshot.Child("username").Value.ToString();
+                    int click = int.Parse(childSnapshot.Child(clickSpan).Value.ToString());
 
                 //Instantiate new scoreboard elements
                 GameObject scoreboardElement = Instantiate(scoreElement, scoreCont);
-                scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(username, click);
+                    scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(username, click);
             }
+            foreach (DataSnapshot childSnapshot in snapshot2.Children.Reverse<DataSnapshot>().Take(1))
+            {
 
+                string username = childSnapshot.Child("username").Value.ToString();
+                int pBclick = int.Parse(childSnapshot.Child(pbSpan).Value.ToString());
 
+                //Instantiate new scoreboard elements
+                GameObject PBElement = Instantiate(scoreElement, pBcont);
+                PBElement.GetComponent<ScoreElement>().NewScoreElement(username, pBclick);
+            }
         }
 
     }
 
     //Update the scoreboard every 1.5 seconds rather than constantly
-    private IEnumerator KeepScoreboardUpdating(string clickType, Transform scoreboardCont)
+    private IEnumerator KeepScoreboardUpdating(string clickType, string pBspan, Transform scoreboardCont, Transform pBcont)
     {
-        StartCoroutine(LoadScoreboardData(clickType, scoreboardCont));
+        Debug.Log("Scoreboard updating");
+        StartCoroutine(LoadScoreboardData(clickType, pBspan, scoreboardCont, pBcont));
         yield return new WaitForSeconds(1.5f);
-        lbUpdate = StartCoroutine(KeepScoreboardUpdating(clickType, scoreboardCont));
+        lbUpdate = StartCoroutine(KeepScoreboardUpdating(clickType, pBspan, scoreboardCont, pBcont));
     }
 }
 

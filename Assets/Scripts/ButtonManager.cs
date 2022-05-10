@@ -9,6 +9,7 @@ public class ButtonManager : MonoBehaviour
     public int clickCount;
     public FirebaseManager FB;
     public TMP_Text LBText;
+    public TMP_Text PBText;
 
     // Start is called before the first frame update
     public void ToggleShowHideFullPanel(GameObject obj)
@@ -35,5 +36,10 @@ public class ButtonManager : MonoBehaviour
     public void LeaderboardText(string text)
     {
         LBText.text = text;
+    }
+
+    public void ChampText(string text)
+    {
+        PBText.text = text;
     }
 }
