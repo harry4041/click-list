@@ -44,6 +44,9 @@ public class FirebaseManager : MonoBehaviour
     public TMP_Text dailyClicks;
     public TMP_Text weeklyClicks;
     public TMP_Text monthlyClicks;
+    public TMP_Text dailyPB;
+    public TMP_Text weeklyPB;
+    public TMP_Text monthlyPB;
     public int lifetimeInt;
     public int dailyInt;
     public int weeklyInt;
@@ -407,6 +410,11 @@ public class FirebaseManager : MonoBehaviour
             weeklyClicks.text = weekly.ToString();
             monthlyClicks.text = monthly.ToString();
             lifetimeClicks.text = allTime.ToString();
+            
+            StartCoroutine(PersonalBest("lastDaily", dailyPB));
+            StartCoroutine(PersonalBest("lastMonthly", monthlyPB));
+            StartCoroutine(PersonalBest("lastWeekly", weeklyPB));
+
 
             canUpdateClicks = true;
         }
@@ -428,9 +436,28 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
-    public void ResetLocalClicks()
+    public IEnumerator PersonalBest(string pb, TMP_Text pbText)
     {
+        var DBTask = DBreference.Child("users").Child(User.UserId).GetValueAsync();
 
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else if (DBTask.Result.Value == null)
+        {
+            //No data exists yet
+            clickField.text = "0";
+        }
+        else
+        {
+            //Data has been retrieved
+            DataSnapshot snapshot = DBTask.Result;
+
+            pbText.text = snapshot.Child(pb).Value.ToString();
+        }
     }
 
     public IEnumerator SetFBValue(string child, int value)

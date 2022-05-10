@@ -9,7 +9,7 @@ admin.initializeApp(functions.config().firebase);
 const dbCon = admin.database().ref("/users/");
 
 // Runs weekly on Mondays at 00:01
-exports.dailyReset = functions.pubsub.schedule("01 0 * * 1")
+exports.dailyReset = functions.pubsub.schedule("01 0 * * *")
     .timeZone("Europe/London")
     .onRun((context) => {
       dbCon.once("value", function(snapshot) {
