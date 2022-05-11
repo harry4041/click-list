@@ -8,6 +8,12 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+    public AdsManager AM;
+    private void Start()
+    {
+        AM.ShowBanner();
+    }
+
     /*public DateTime DTLoggedIn;
     public string dateLoggedIn;
     public string timeLoggedIn;
