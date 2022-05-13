@@ -53,8 +53,9 @@ public class AdsManager : MonoBehaviour, IUnityAdsListener
         {
             Advertisement.Banner.SetPosition(BannerPosition.BOTTOM_CENTER);
             Advertisement.Banner.Show(banner);
-            log.text = "Add to show";
+            log.text = "click";
 
+            log.text = Advertisement.GetPlacementState().ToString();
         }
         else
         {
