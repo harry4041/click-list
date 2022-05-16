@@ -15,7 +15,8 @@ exports.dailyReset = functions.pubsub.schedule("01 0 * * *")
       dbCon.once("value", function(snapshot) {
         snapshot.forEach(function(child) {
           const oldClickValue = child.val().click;
-          const oldPB = child.val().lastDaily;
+          const oldPB = child.val().lastDailyPB;
+          const daily = child.val().lastDaily;
           let updatePB = null;
           if (oldPB < oldClickValue) {
             updatePB = oldClickValue;
@@ -24,7 +25,8 @@ exports.dailyReset = functions.pubsub.schedule("01 0 * * *")
           }
           console.log(oldClickValue);
           child.ref.update({
-            lastDaily: updatePB,
+            lastDaily: daily,
+            lastDailyPB: updatePB,
             click: 0,
             dailyMidnight: "dailyMidnight",
           });
@@ -39,7 +41,8 @@ exports.weeklyReset = functions.pubsub.schedule("01 0 * * 1")
       dbCon.once("value", function(snapshot) {
         snapshot.forEach(function(child) {
           const oldClickValue = child.val().clickWeekly;
-          const oldPB = child.val().lastWeekly;
+          const oldPB = child.val().lastWeeklyPB;
+          const weekly = child.val().lastWeekly;
           let updatePB = null;
           if (oldPB < oldClickValue) {
             updatePB = oldClickValue;
@@ -48,7 +51,8 @@ exports.weeklyReset = functions.pubsub.schedule("01 0 * * 1")
           }
           console.log(oldClickValue);
           child.ref.update({
-            lastWeekly: updatePB,
+            lastWeekly: weekly,
+            lastWeeklyPB: updatePB,
             clickWeekly: 0,
             weeklyMidnight: "weeklyMidnight",
           });
@@ -63,7 +67,8 @@ exports.monthlyReset = functions.pubsub.schedule("01 0 1 * *")
       dbCon.once("value", function(snapshot) {
         snapshot.forEach(function(child) {
           const oldClickValue = child.val().clickMonthly;
-          const oldPB = child.val().lastMonthly;
+          const oldPB = child.val().lastMonthlyPB;
+          const monthly = child.val().lastWeekly;
           let updatePB = null;
           if (oldPB < oldClickValue) {
             updatePB = oldClickValue;
@@ -72,7 +77,8 @@ exports.monthlyReset = functions.pubsub.schedule("01 0 1 * *")
           }
           console.log(oldClickValue);
           child.ref.update({
-            lastMonthly: updatePB,
+            lastMonthly: monthly,
+            lastMonthlyPB: updatePB,
             clickMonthly: 0,
             monthlyMidnight: "monthlyMidnight",
           });

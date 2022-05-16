@@ -42,8 +42,6 @@ public class FirebaseManager : MonoBehaviour
     public GameObject pbElement;
     public Transform pbContent;
 
-
-
     [Header("LocalData")]
     public TMP_Text lifetimeClicks;
     public TMP_Text dailyClicks;
@@ -57,6 +55,15 @@ public class FirebaseManager : MonoBehaviour
     public int weeklyInt;
     public int monthlyInt;
     public bool canUpdateClicks = false;
+
+    [Header("PersonalStatsPage")]
+    public TMP_Text yesterdaysClicks;
+    public TMP_Text lastWeeksClicks;
+    public TMP_Text lastMonthsClicks;
+    public TMP_Text dailyPB2;
+    public TMP_Text weeklyPB2;
+    public TMP_Text monthlyPB2;
+
 
     public bool midnight = false;
     public bool midnightWeekly = false;
@@ -283,11 +290,14 @@ public class FirebaseManager : MonoBehaviour
                 var DBTask2 = DBreference.Child("users").Child(User.UserId).Child("clickMonthly").SetValueAsync(0);
                 var DBTask3 = DBreference.Child("users").Child(User.UserId).Child("clickAlltime").SetValueAsync(0);
                 var DBTask4 = DBreference.Child("users").Child(User.UserId).Child("lastDaily").SetValueAsync(0);
-                var DBTask5 = DBreference.Child("users").Child(User.UserId).Child("lastMonthly").SetValueAsync(0);
+                var DBTask5 = DBreference.Child("users").Child(User.UserId).Child("lastDailyPB").SetValueAsync(0);
                 var DBTask6 = DBreference.Child("users").Child(User.UserId).Child("lastWeekly").SetValueAsync(0);
-                var DBTask7 = DBreference.Child("users").Child(User.UserId).Child("dailyMidnight").SetValueAsync("dailyMidnight");
-                var DBTask8 = DBreference.Child("users").Child(User.UserId).Child("weeklyMidnight").SetValueAsync("weeklyMidnight");
-                var DBTask9 = DBreference.Child("users").Child(User.UserId).Child("monthlyMidnight").SetValueAsync("monthlyMidnight");
+                var DBTask7 = DBreference.Child("users").Child(User.UserId).Child("lastWeeklyPB").SetValueAsync(0);
+                var DBTask8 = DBreference.Child("users").Child(User.UserId).Child("lastMonthly").SetValueAsync(0);
+                var DBTask9 = DBreference.Child("users").Child(User.UserId).Child("lastMonthlyPB").SetValueAsync(0);
+                var DBTask10 = DBreference.Child("users").Child(User.UserId).Child("dailyMidnight").SetValueAsync("dailyMidnight");
+                var DBTask11 = DBreference.Child("users").Child(User.UserId).Child("weeklyMidnight").SetValueAsync("weeklyMidnight");
+                var DBTask12 = DBreference.Child("users").Child(User.UserId).Child("monthlyMidnight").SetValueAsync("monthlyMidnight");
 
                 if (User != null)
                 {
@@ -436,20 +446,34 @@ public class FirebaseManager : MonoBehaviour
             //Data has been retrieved
             DataSnapshot snapshot = DBTask.Result;
 
-            //Set 'click' to FB variable of user click
+            //THIS FEELS EXPENSIVE!!!
+            //Get pretty much every value from FB
             int daily = int.Parse(snapshot.Child("click").Value.ToString());
             int weekly = int.Parse(snapshot.Child("clickWeekly").Value.ToString());
             int monthly = int.Parse(snapshot.Child("clickMonthly").Value.ToString());
             int allTime = int.Parse(snapshot.Child("clickAlltime").Value.ToString());
+            int lastDaily = int.Parse(snapshot.Child("lastDaily").Value.ToString());
+            int lastWeekly = int.Parse(snapshot.Child("lastWeekly").Value.ToString());
+            int lastMonthly = int.Parse(snapshot.Child("lastMonthly").Value.ToString());
+            int lastDailyPB = int.Parse(snapshot.Child("lastDailyPB").Value.ToString());
+            int lastWeeklyPB = int.Parse(snapshot.Child("lastWeeklyPB").Value.ToString());
+            int lastMonthlyPB = int.Parse(snapshot.Child("lastMonthlyPB").Value.ToString());
 
+            //Populate leaderboards on both main page and personal stats
             dailyClicks.text = daily.ToString();
             weeklyClicks.text = weekly.ToString();
             monthlyClicks.text = monthly.ToString();
             lifetimeClicks.text = allTime.ToString();
-            
-            StartCoroutine(PersonalBest("lastDaily", dailyPB));
-            StartCoroutine(PersonalBest("lastMonthly", monthlyPB));
-            StartCoroutine(PersonalBest("lastWeekly", weeklyPB));
+            yesterdaysClicks.text = lastDaily.ToString();
+            lastWeeksClicks.text = lastWeekly.ToString();
+            lastMonthsClicks.text = lastMonthly.ToString();
+            dailyPB2.text = lastDailyPB.ToString();
+            weeklyPB2.text = lastWeeklyPB.ToString();
+            monthlyPB2.text = lastMonthlyPB.ToString();
+
+            StartCoroutine(PersonalBest("lastDailyPB", dailyPB));
+            StartCoroutine(PersonalBest("lastMonthlyPB", monthlyPB));
+            StartCoroutine(PersonalBest("lastWeeklyPB", weeklyPB));
 
 
             canUpdateClicks = true;

@@ -6,7 +6,6 @@ using TMPro;
 
 public class AdsManager : MonoBehaviour, IUnityAdsListener
 {
-    public TMP_Text log;
 
 #if UNITY_IOS
     string gameId = "4750176";
@@ -53,13 +52,9 @@ public class AdsManager : MonoBehaviour, IUnityAdsListener
         {
             Advertisement.Banner.SetPosition(BannerPosition.BOTTOM_CENTER);
             Advertisement.Banner.Show(banner);
-            log.text = "click";
-
-            log.text = Advertisement.GetPlacementState().ToString();
         }
         else
         {
-            log.text = "no add to show";
             StartCoroutine(RepeatShowBanner());
         }
     }
