@@ -2915,6 +2915,7 @@ GameObject:
   m_Component:
   - component: {fileID: 383119698}
   - component: {fileID: 383119697}
+  - component: {fileID: 383119699}
   m_Layer: 0
   m_Name: AuthManager
   m_TagString: Untagged
@@ -2935,12 +2936,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dependencyStatus: 0
-  emailLoginField: {fileID: 1760241313}
-  passwordLoginField: {fileID: 1593020186}
-  usernameRegisterField: {fileID: 455119283}
-  emailRegisterField: {fileID: 2079014949}
-  passwordRegisterField: {fileID: 387684106}
-  warningRegisterText: {fileID: 1307612341}
+  emailLoginField: {fileID: 0}
+  passwordLoginField: {fileID: 0}
+  usernameRegisterField: {fileID: 0}
+  emailRegisterField: {fileID: 0}
+  passwordRegisterField: {fileID: 0}
+  warningRegisterText: {fileID: 0}
   usernameField: {fileID: 815561743}
   clickField: {fileID: 2063763096}
   scoreElement: {fileID: 1472164434015034400, guid: fe7c7110b983a4a428b995024f32fe08, type: 3}
@@ -2988,6 +2989,31 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &383119699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 383119696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38766bdaeb783f840b7ee86a64697e45, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dependencyStatus: 0
+  TS: {fileID: 1209707887}
+  warningRegisterText: {fileID: 1307612341}
+  usernameRegisterField: {fileID: 455119283}
+  emailRegisterField: {fileID: 2079014949}
+  passwordRegisterField: {fileID: 387684106}
+  usernameField: {fileID: 815561743}
+  loginPanel: {fileID: 701138877}
+  mainGamePanel: {fileID: 870861817}
+  clickField: {fileID: 2063763096}
+  emailLoginField: {fileID: 1760241313}
+  passwordLoginField: {fileID: 1593020186}
+  FB: {fileID: 383119697}
 --- !u!1 &387684104
 GameObject:
   m_ObjectHideFlags: 0
@@ -10144,6 +10170,7 @@ MonoBehaviour:
   MGPanel: {fileID: 870861817}
   ShopPanel: {fileID: 1043138461}
   FB: {fileID: 383119697}
+  loggedIn: 0
 --- !u!114 &1209707888
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16355,8 +16382,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 383119697}
-        m_TargetAssemblyTypeName: AuthManager, Assembly-CSharp
+      - m_Target: {fileID: 383119699}
+        m_TargetAssemblyTypeName: FirebaseLogReg, Assembly-CSharp
         m_MethodName: LoginButton
         m_Mode: 1
         m_Arguments:
@@ -17710,9 +17737,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 383119697}
-        m_TargetAssemblyTypeName: AuthManager, Assembly-CSharp
-        m_MethodName: RegisterButton
+      - m_Target: {fileID: 383119699}
+        m_TargetAssemblyTypeName: FirebaseLogReg, Assembly-CSharp
+        m_MethodName: RegisterButton2
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

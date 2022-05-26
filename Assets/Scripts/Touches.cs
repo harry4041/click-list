@@ -9,6 +9,7 @@ public class Touches : MonoBehaviour
     public GameObject ShopPanel;
     public FirebaseManager FB;
     int touches = 0;
+    public bool loggedIn = false;
 
     private void Start()
     {
@@ -38,8 +39,8 @@ public class Touches : MonoBehaviour
     public void SendAndResetTouches()
     {
             Debug.Log("Sending " + touches + " touches.");
-            FB.ClickButton(touches);
-            touches = 0;   
+            //FB.ClickButton(touches);
+            touches = 0;
     }
 }
 
