@@ -10,17 +10,27 @@ public class AdsManager : MonoBehaviour, IUnityAdsListener
 {
 
     private BannerView bannerView;
+    private RewardedAd rewardedAd;
 
 #if UNITY_IOS
     string gameId = "4750176";
     string rewarded = "Rewarded_iOS";
     string banner = "Banner_iOS";
     string Interstitial = "Interstitial_iOS";
+    
+    //Google (Currently placeholder)
+    string adUnitId = "ca-app-pub-3940256099942544/2934735716";
+    string rewardedGoogleAd = "ca-app-pub-3940256099942544/1712485313";
+
 #else
     string gameId = "4750177";
     string rewarded = "Rewarded_Android";
     string banner = "Banner_Android";
     string Interstitial = "Interstitial_Android";
+
+    //Google (Currently placeholder)
+    string adUnitId = "ca-app-pub-3940256099942544/6300978111";
+    string rewardedGoogleAd = "ca-app-pub-3940256099942544/5224354917";
 #endif
 
     void Start()
@@ -43,13 +53,32 @@ public class AdsManager : MonoBehaviour, IUnityAdsListener
 
     public void PlayRewardedAd()
     {
+
+
         if (Advertisement.IsReady(rewarded))
         {
             Advertisement.Show(rewarded);
         }
         else
         {
-            Debug.Log("Rewarded ad not ready!");
+            //If unity fails, show google
+            this.rewardedAd = new RewardedAd(rewardedGoogleAd);
+
+            // Create an empty ad request.
+            AdRequest request = new AdRequest.Builder().Build();
+            // Load the rewarded ad with the request.
+            this.rewardedAd.LoadAd(request);
+
+            if (this.rewardedAd.IsLoaded())
+            {
+                this.rewardedAd.Show();
+            }
+            else
+            {
+                PlayRewardedAd();
+            }
+
+            Debug.Log("Unity ewarded ad not ready!");
         }
     }
 
@@ -110,15 +139,6 @@ public class AdsManager : MonoBehaviour, IUnityAdsListener
 
     private void RequestBanner()
     {
-        //These are googles test accounts
-        #if UNITY_ANDROID
-            string adUnitId = "ca-app-pub-3940256099942544/6300978111";
-        #elif UNITY_IPHONE
-            string adUnitId = "ca-app-pub-3940256099942544/2934735716";
-        #else
-            string adUnitId = "unexpected_platform";
-         #endif
-
         // Create a 320x50 banner at the top of the screen.
         this.bannerView = new BannerView(adUnitId, AdSize.Banner, AdPosition.Bottom);
 
