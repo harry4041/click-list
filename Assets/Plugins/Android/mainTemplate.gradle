@@ -1,3 +1,17 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
 // Android Resolver Repos Start
 ([rootProject] + (rootProject.subprojects as List)).each { project ->
     project.repositories {

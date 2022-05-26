@@ -33,13 +33,12 @@ public class Touches : MonoBehaviour
 
             }
         }
-
     }
 
     public void SendAndResetTouches()
     {
             Debug.Log("Sending " + touches + " touches.");
-            //FB.ClickButton(touches);
+            FB.ClickButton(touches);
             touches = 0;
     }
 }

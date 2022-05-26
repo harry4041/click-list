@@ -115,11 +115,28 @@ public class FirebaseManager : MonoBehaviour
     //The Login button is the first thing the player presses, therefore it's used to load all data
     public void LoginButton()
     {
+        //Call the login coroutine passing the email and password
+        StartCoroutine(Login(emailLoginField.text, passwordLoginField.text));
+
         //Start the leaderboard updating
         lb = StartCoroutine(KeepScoreboardUpdating("click", "lastDaily", scoreboardContent, pbContent));
 
         //Update the user numbers then do it all locally
         StartCoroutine(UpdateLocalClicksOnStart());
+
+    }
+    //Function for the register button
+    public void RegisterButton()
+    {
+        //Call the register coroutine passing the email, password, and username
+        StartCoroutine(Register(emailRegisterField.text, passwordRegisterField.text, usernameRegisterField.text));
+    }
+
+    //Function for the save button
+    public void SaveDataButton()
+    {
+        StartCoroutine(UpdateUsernameAuth(usernameField.text));
+        StartCoroutine(UpdateUsernameDatabase(usernameField.text));
     }
 
     public void ScoreboardButton(string clickType)
@@ -130,13 +147,13 @@ public class FirebaseManager : MonoBehaviour
             StopCoroutine(lb);
             StopCoroutine(lbUpdate);
         }
-        
-        if(clickType == "click")
+
+        if (clickType == "click")
         {
             pbType = "lastDaily";
             lb = StartCoroutine(KeepScoreboardUpdating(clickType, pbType, scoreboardContent, pbContent));
-        } 
-        else if(clickType == "clickWeekly")
+        }
+        else if (clickType == "clickWeekly")
         {
             pbType = "lastWeekly";
             lb = StartCoroutine(KeepScoreboardUpdating(clickType, pbType, scoreboardContent, pbContent));
@@ -154,7 +171,7 @@ public class FirebaseManager : MonoBehaviour
             lb = StartCoroutine(KeepScoreboardUpdating(clickType, pbType, scoreboardContent, pbContent));
 
         }
-        
+
     }
 
     public void ClickButton(int clicksToAdd)
@@ -164,6 +181,191 @@ public class FirebaseManager : MonoBehaviour
         StartCoroutine(IncreaseClicks("clickMonthly", clicksToAdd, monthlyClicks));
         StartCoroutine(IncreaseClicks("clickAlltime", clicksToAdd));
     }
+
+
+    private IEnumerator Login(string _email, string _password)
+    {
+        //Call the Firebase auth signin function passing the email and password
+        var LoginTask = auth.SignInWithEmailAndPasswordAsync(_email, _password);
+        //Wait until the task completes
+        yield return new WaitUntil(predicate: () => LoginTask.IsCompleted);
+
+        if (LoginTask.Exception != null)
+        {
+            //If there are errors handle them
+            Debug.LogWarning(message: $"Failed to register task with {LoginTask.Exception}");
+            FirebaseException firebaseEx = LoginTask.Exception.GetBaseException() as FirebaseException;
+            AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
+
+            string message = "Login Failed!";
+            switch (errorCode)
+            {
+                case AuthError.MissingEmail:
+                    message = "Missing Email";
+                    break;
+                case AuthError.MissingPassword:
+                    message = "Missing Password";
+                    break;
+                case AuthError.WrongPassword:
+                    message = "Wrong Password";
+                    break;
+                case AuthError.InvalidEmail:
+                    message = "Invalid Email";
+                    break;
+                case AuthError.UserNotFound:
+                    message = "Account does not exist";
+                    break;
+            }
+            warningRegisterText.text = message;
+        }
+        else
+        {
+            //User is now logged in
+            //Now get the result
+            User = LoginTask.Result;
+            Debug.LogFormat("User signed in successfully: {0} ({1})", User.DisplayName, User.Email);
+            warningRegisterText.text = "";
+            warningRegisterText.text = "Logged In";
+            StartCoroutine(LoadUserData());
+
+
+            usernameField.text = User.DisplayName;
+
+            //Hide the login panel and open the game panel
+            mainGamePanel.SetActive(!mainGamePanel.activeInHierarchy);
+            yield return new WaitForSeconds(1.5f);
+            loginPanel.SetActive(!loginPanel.activeInHierarchy);
+
+            //UIManager.instance.UserDataScreen(); // Change to user data UI
+            warningRegisterText.text = "";
+        }
+    }
+
+    private IEnumerator Register(string _email, string _password, string _username)
+    {
+        if (_username == "")
+        {
+            //If the username field is blank show a warning
+            warningRegisterText.text = "Missing Username";
+        }
+        else
+        {
+            //Call the Firebase auth signin function passing the email and password
+            var RegisterTask = auth.CreateUserWithEmailAndPasswordAsync(_email, _password);
+            //Wait until the task completes
+            yield return new WaitUntil(predicate: () => RegisterTask.IsCompleted);
+
+            if (RegisterTask.Exception != null)
+            {
+                //If there are errors handle them
+                Debug.LogWarning(message: $"Failed to register task with {RegisterTask.Exception}");
+                FirebaseException firebaseEx = RegisterTask.Exception.GetBaseException() as FirebaseException;
+                AuthError errorCode = (AuthError)firebaseEx.ErrorCode;
+
+                string message = "Register Failed!";
+                switch (errorCode)
+                {
+                    case AuthError.MissingEmail:
+                        message = "Missing Email";
+                        break;
+                    case AuthError.MissingPassword:
+                        message = "Missing Password";
+                        break;
+                    case AuthError.WeakPassword:
+                        message = "Weak Password";
+                        break;
+                    case AuthError.EmailAlreadyInUse:
+                        message = "Email Already In Use";
+                        break;
+                }
+                warningRegisterText.text = message;
+            }
+            else
+            {
+                //User has now been created
+                //Now get the result
+                User = RegisterTask.Result;
+                var DBTask = DBreference.Child("users").Child(User.UserId).Child("click").SetValueAsync(0);
+                var DBTask1 = DBreference.Child("users").Child(User.UserId).Child("clickWeekly").SetValueAsync(0);
+                var DBTask2 = DBreference.Child("users").Child(User.UserId).Child("clickMonthly").SetValueAsync(0);
+                var DBTask3 = DBreference.Child("users").Child(User.UserId).Child("clickAlltime").SetValueAsync(0);
+                var DBTask4 = DBreference.Child("users").Child(User.UserId).Child("lastDaily").SetValueAsync(0);
+                var DBTask5 = DBreference.Child("users").Child(User.UserId).Child("lastDailyPB").SetValueAsync(0);
+                var DBTask6 = DBreference.Child("users").Child(User.UserId).Child("lastWeekly").SetValueAsync(0);
+                var DBTask7 = DBreference.Child("users").Child(User.UserId).Child("lastWeeklyPB").SetValueAsync(0);
+                var DBTask8 = DBreference.Child("users").Child(User.UserId).Child("lastMonthly").SetValueAsync(0);
+                var DBTask9 = DBreference.Child("users").Child(User.UserId).Child("lastMonthlyPB").SetValueAsync(0);
+                var DBTask10 = DBreference.Child("users").Child(User.UserId).Child("dailyMidnight").SetValueAsync("dailyMidnight");
+                var DBTask11 = DBreference.Child("users").Child(User.UserId).Child("weeklyMidnight").SetValueAsync("weeklyMidnight");
+                var DBTask12 = DBreference.Child("users").Child(User.UserId).Child("monthlyMidnight").SetValueAsync("monthlyMidnight");
+
+                if (User != null)
+                {
+                    //Create a user profile and set the username
+                    UserProfile profile = new UserProfile { DisplayName = _username };
+
+                    //Call the Firebase auth update user profile function passing the profile with the username
+                    var ProfileTask = User.UpdateUserProfileAsync(profile);
+
+                    //Wait until the task completes
+                    yield return new WaitUntil(predicate: () => ProfileTask.IsCompleted);
+
+                    if (ProfileTask.Exception != null)
+                    {
+                        //If there are errors handle them
+                        Debug.LogWarning(message: $"Failed to register task with {ProfileTask.Exception}");
+                        warningRegisterText.text = "Username Set Failed!";
+                    }
+                    else
+                    {
+                        //Username is now set
+                        //Now return to login screen
+                        //UIManager.instance.LoginScreen();
+                        warningRegisterText.text = "Registered!";
+
+                    }
+                }
+            }
+        }
+    }
+
+    private IEnumerator UpdateUsernameAuth(string _username)
+    {
+        //Create a user profile and set the username
+        UserProfile profile = new UserProfile { DisplayName = _username };
+
+        //Call the Firebase auth update user profile function passing the profile with the username
+        var ProfileTask = User.UpdateUserProfileAsync(profile);
+        //Wait until the task completes
+        yield return new WaitUntil(predicate: () => ProfileTask.IsCompleted);
+
+        if (ProfileTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {ProfileTask.Exception}");
+        }
+        else
+        {
+            //Auth username is now updated
+        }
+    }
+
+    private IEnumerator UpdateUsernameDatabase(string _username)
+    {
+        //Set the currently logged in user username in the database
+        var DBTask = DBreference.Child("users").Child(User.UserId).Child("username").SetValueAsync(_username);
+
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else
+        {
+            //Database username is now updated
+        }
+    }
+
 
     //TODO: Find a way of doing this not on every click to make it cheaper
     private IEnumerator IncreaseClicks(string timeClick, int clicksToAdd, TMP_Text localComparision = null)
@@ -318,6 +520,49 @@ public class FirebaseManager : MonoBehaviour
         }
     }
 
+    public IEnumerator SetFBValue(string child, int value)
+    {
+        //Set the currently logged in user username in the database
+        var DBTask = DBreference.Child("users").Child(User.UserId).Child(child).SetValueAsync(value);
+
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else
+        {
+
+        }
+    }
+
+    private IEnumerator LoadUserData()
+    {
+        //Get the currently logged in user data
+        var DBTask = DBreference.Child("users").Child(User.UserId).GetValueAsync();
+
+        yield return new WaitUntil(predicate: () => DBTask.IsCompleted);
+
+        if (DBTask.Exception != null)
+        {
+            Debug.LogWarning(message: $"Failed to register task with {DBTask.Exception}");
+        }
+        else if (DBTask.Result.Value == null)
+        {
+            //No data exists yet
+            clickField.text = "0";
+
+        }
+        else
+        {
+            //Data has been retrieved
+            DataSnapshot snapshot = DBTask.Result;
+
+            clickField.text = snapshot.Child("click").Value.ToString();
+        }
+    }
+
     private IEnumerator LoadScoreboardData(string clickSpan, string pbSpan, Transform scoreCont, Transform pBcont)
     {
         //Get all the users data ordered by kills amount
@@ -349,13 +594,13 @@ public class FirebaseManager : MonoBehaviour
             //Loop through every users UID and shows top 10
             foreach (DataSnapshot childSnapshot in snapshot.Children.Reverse<DataSnapshot>().Take(10))
             {
-                
-                    string username = childSnapshot.Child("username").Value.ToString();
-                    int click = int.Parse(childSnapshot.Child(clickSpan).Value.ToString());
+
+                string username = childSnapshot.Child("username").Value.ToString();
+                int click = int.Parse(childSnapshot.Child(clickSpan).Value.ToString());
 
                 //Instantiate new scoreboard elements
                 GameObject scoreboardElement = Instantiate(scoreElement, scoreCont);
-                    scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(username, click);
+                scoreboardElement.GetComponent<ScoreElement>().NewScoreElement(username, click);
             }
             foreach (DataSnapshot childSnapshot in snapshot2.Children.Reverse<DataSnapshot>().Take(1))
             {
@@ -380,5 +625,4 @@ public class FirebaseManager : MonoBehaviour
         lbUpdate = StartCoroutine(KeepScoreboardUpdating(clickType, pBspan, scoreboardCont, pBcont));
     }
 }
-
 

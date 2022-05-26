@@ -1,5 +1,5 @@
 {
-    "m_SelectedDeviceId": "",
+    "m_SelectedDeviceId": "9C091FFBA00216",
     "m_SelectedPackage": {
         "deviceId": "",
         "name": "",
@@ -7,7 +7,20 @@
         "exited": false
     },
     "m_SelectedPriority": 0,
-    "m_KnownPackagesForSerialization": [],
+    "m_KnownPackagesForSerialization": [
+        {
+            "deviceId": "9C091FFBA00216",
+            "name": "com.unity3d.mobileremote",
+            "processId": 30429,
+            "exited": true
+        },
+        {
+            "deviceId": "9C091FFBA00216",
+            "name": "com.android.settings",
+            "processId": 29985,
+            "exited": false
+        }
+    ],
     "m_Tags": {
         "m_Entries": [
             {
@@ -41,9 +54,20 @@
         ]
     },
     "m_MemoryViewerState": {
-        "MemoryWindowHeight": 0.0,
-        "MemoryWindowWidth": 0.0,
-        "MemoryTypeEnabled": [],
+        "MemoryWindowHeight": 300.0,
+        "MemoryWindowWidth": 170.0,
+        "MemoryTypeEnabled": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+        ],
         "MemoryGroup": 2,
         "Behavior": 0
     },
