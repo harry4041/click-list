@@ -10,7 +10,7 @@ using System.Collections.Generic;
 public class FirebaseLogReg : MonoBehaviour
 {
 
-    public DependencyStatus dependencyStatus;
+    /*public DependencyStatus dependencyStatus;
     public DatabaseReference DBreference;
     public FirebaseAuth auth;
     public FirebaseUser User;
@@ -273,5 +273,5 @@ public class FirebaseLogReg : MonoBehaviour
             //Database username is now updated
         }
     }
-
+    */
 }
