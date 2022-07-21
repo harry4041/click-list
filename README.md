@@ -1,6 +1,2 @@
-<<<<<<< HEAD
-"# ClickList" 
-=======
-# click-llist
+# Click list
 Clicker leader board game
->>>>>>> c8050bea4942098cea08d626ca81aa37edd94a10
